@@ -31,7 +31,7 @@ cb_start() {
 	screen -p 0 -S $SCREEN -X exec su $USERNAME -s /bin/bash -c "$INVOCATION"
 
 	seconds=0
-	until isrunning 
+	until is_running 
 	do
 		sleep 1
 		seconds=$seconds+1
