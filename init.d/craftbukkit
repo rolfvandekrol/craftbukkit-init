@@ -1,0 +1,42 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:   craftbukkit
+# Required-Start: $local_fs $remote_fs
+# Required-Stop:  $local_fs $remote_fs
+# Should-Start:   $network
+# Should-Stop:    $network
+# Default-Start:  2 3 4 5
+# Default-Stop:   0 1 6
+# Short-Description:    Craftbukkit server
+# Description:    Init script for craftbukkit server
+### END INIT INFO
+
+if test -f /etc/default/craftbukkit; then
+    . /etc/default/craftbukkit
+fi
+
+ME=`whoami`
+as_user() {
+	if [ $ME == $USERNAME ] ; then
+		bash -c "$1"
+	else
+		su $USERNAME -s /bin/bash -c "$1"
+	fi
+}
+
+cb_start() {
+	# cd $CRAFTBUKKIT_PATH
+	screen -dmS $SCREEN "cd $CRAFTBUKKIT_PATH && su $INVOCATION"
+}
+
+case "$1" in
+	start)
+			mc_start
+		fi
+		;;
+	*)
+		echo "No such command, see $0 help"
+		exit 1
+		;;
+esac

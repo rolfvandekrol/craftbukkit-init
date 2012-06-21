@@ -1,0 +1,15 @@
+#!/bin/sh
+
+USERNAME="minecraft"
+
+SCREEN="minecraft"
+
+CRAFTBUKKIT_PATH="/opt/craftbukkit"
+CRAFTBUKKIT_JAR="craftbukkit.jar"
+
+CPU_COUNT=2
+INITMEM="2048M"
+MAXMEM="2048M"
+
+INVOCATION="java -Xmx$MAXMEM -Xms$INITMEM -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalPacing -XX:ParallelGCThreads=$CPU_COUNT -XX:+AggressiveOpts -jar $CRAFTBUKKIT_JAR nogui"
+
