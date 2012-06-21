@@ -24,6 +24,18 @@ is_running(){
 	return 1
 }
 
+cb_server_cmd() {
+	if is_running
+	then
+		screen -p 0 -S $SCREEN -X stuff "$1\015"
+	else
+		echo "Craftbukkit was not running. Not able to execute command."
+	fi
+}
+cb_say(){
+	cb_server_cmd "say \"$1\""
+}
+
 cb_start() {
 	# cd $CRAFTBUKKIT_PATH
 	cd $CRAFTBUKKIT_PATH
@@ -51,6 +63,9 @@ cb_start() {
 case "$1" in
 	start)
 		cb_start
+		;;
+	say)
+		mc_say "$2"
 		;;
 	*)
 		echo "No such command, see $0 help"
