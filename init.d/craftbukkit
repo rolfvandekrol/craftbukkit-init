@@ -27,9 +27,10 @@ as_user() {
 
 cb_start() {
 	# cd $CRAFTBUKKIT_PATH
+	cd $CRAFTBUKKIT_PATH
 	screen -dmS $SCREEN
-	screen -p 0 -S $SCREEN -X exec cd $CRAFTBUKKIT_PATH
 	screen -p 0 -S $SCREEN -X exec su $USERNAME -s /bin/bash -c "$INVOCATION"
+	cd -
 }
 
 case "$1" in
