@@ -16,13 +16,12 @@ if test -f /etc/default/craftbukkit; then
     . /etc/default/craftbukkit
 fi
 
-ME=`whoami`
-as_user() {
-	if [ $ME == $USERNAME ] ; then
-		bash -c "$1"
-	else
-		su $USERNAME -s /bin/bash -c "$1"
+is_running(){
+	if ps aux | grep "java.*${CRAFTBUKKIT_JAR}" | grep -v "su\|grep"  > /dev/null
+	then
+		return 0
 	fi
+	return 1
 }
 
 cb_start() {
@@ -30,7 +29,23 @@ cb_start() {
 	cd $CRAFTBUKKIT_PATH
 	screen -dmS $SCREEN
 	screen -p 0 -S $SCREEN -X exec su $USERNAME -s /bin/bash -c "$INVOCATION"
-	cd -
+
+	seconds=0
+	until isrunning 
+	do
+		sleep 1
+		seconds=$seconds+1
+		if [[ $seconds -eq 5 ]]
+		then
+			echo "Still not running, waiting a while longer..."
+		fi
+		if [[ $seconds -ge 120 ]]
+		then
+			echo "Failed to start, aborting."
+			exit 1
+		fi
+	done	
+	echo "Craftbukkit is running."
 }
 
 case "$1" in
