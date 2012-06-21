@@ -32,8 +32,7 @@ cb_start() {
 
 case "$1" in
 	start)
-			mc_start
-		fi
+		mc_start
 		;;
 	*)
 		echo "No such command, see $0 help"
