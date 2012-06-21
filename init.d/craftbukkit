@@ -27,7 +27,7 @@ is_running(){
 cb_server_cmd() {
 	if is_running
 	then
-		screen -p 0 -S $SCREEN -X eval "stuff '$1\015'"
+		screen -p 0 -S $SCREEN -X eval "stuff \"$1\"\015"
 	else
 		echo "Craftbukkit was not running. Not able to execute command."
 	fi
