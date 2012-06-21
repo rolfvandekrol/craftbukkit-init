@@ -65,7 +65,7 @@ case "$1" in
 		cb_start
 		;;
 	say)
-		mc_say "$2"
+		cb_say "$2"
 		;;
 	*)
 		echo "No such command, see $0 help"
