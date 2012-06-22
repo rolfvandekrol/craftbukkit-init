@@ -47,6 +47,38 @@ cb_save_on() {
 	cb_server_cmd "save-on"
 }
 
+cb_get_world() {
+	a=1
+	for NAME in $(ls $CRAFTBUKKIT_WORLD_STORAGE)
+	do
+		if [ -d $CRAFTBUKKIT_WORLD_STORAGE/$NAME ]
+		then
+			WORLDNAME[$a]=$NAME
+			a=$a+1
+		fi
+	done
+}
+cb_check_links() {
+	get_worlds
+	for INDEX in ${!WORLDNAME[@]}
+	do
+		if [[ -L $CRAFTBUKKIT_PATH/${WORLDNAME[$INDEX]} || ! -a $CRAFTBUKKIT_PATH/${WORLDNAME[$INDEX]} ]]
+		then
+			link=`ls -l $CRAFTBUKKIT_PATH/${WORLDNAME[$INDEX]} | awk '{print $11}'`
+
+			if [ "$link" != "${CRAFTBUKKIT_WORLD_STORAGE}/${WORLDNAME[$INDEX]}" ]
+			then
+				as_user "rm -f $CRAFTBUKKIT_PATH/${WORLDNAME[$INDEX]}"
+				as_user "ln -s ${CRAFTBUKKIT_WORLD_STORAGE}/${WORLDNAME[$INDEX]} $CRAFTBUKKIT_PATH/${WORLDNAME[$INDEX]}"
+				echo "Created link for ${WORLDNAME[$INDEX]}"
+			fi
+		else
+			echo "Could not process ${WORLDNAME[$INDEX]}. please move all worlds to ${CRAFTBUKKIT_WORLD_STORAGE}."
+			exit 1
+		fi
+	done
+}
+
 
 cb_start() {
 	# cd $CRAFTBUKKIT_PATH
@@ -103,6 +135,7 @@ cb_stop() {
 
 case "$1" in
 	start)
+		cb_check_links
 		cb_start
 		;;
 	stop)

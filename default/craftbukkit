@@ -7,6 +7,8 @@ SCREEN="minecraft"
 CRAFTBUKKIT_PATH="/opt/craftbukkit"
 CRAFTBUKKIT_JAR="craftbukkit.jar"
 
+CRAFTBUKKIT_WORLD_STORAGE="/var/minecraft/worlds"
+
 CPU_COUNT=2
 INITMEM="2048M"
 MAXMEM="2048M"
