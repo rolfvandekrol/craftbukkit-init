@@ -32,9 +32,21 @@ cb_server_cmd() {
 		echo "Craftbukkit was not running. Not able to execute command."
 	fi
 }
-cb_say(){
+cb_say() {
 	cb_server_cmd "say $1"
 }
+cb_save() {
+	cb_server_cmd "save-all"
+}
+cb_save_off() {
+	cb_server_cmd "save-off"
+	sync
+	sleep 10
+}
+cb_save_on() {
+	cb_server_cmd "save-on"
+}
+
 
 cb_start() {
 	# cd $CRAFTBUKKIT_PATH
@@ -60,9 +72,40 @@ cb_start() {
 	echo "Craftbukkit is running."
 }
 
+cb_stop() {
+	cb_say "SERVER SHUTTING DOWN IN 10 SECONDS"
+	cb_save
+	sleep 10
+	cb_server_cmd "stop"
+	sleep 1
+
+	seconds=0
+	while is_running 
+	do
+		sleep 1
+		seconds=$seconds+1
+		if [[ $seconds -eq 5 ]]
+		then
+			echo "Still running, waiting a while longer..."
+		fi
+		if [[ $seconds -ge 120 ]]
+		then
+			echo "Failed to stop, aborting."
+			exit 1
+		fi
+	done
+
+	screen -p 0 -S $SCREEN -X exec exit
+
+	echo "Craftbukkit is stopped."
+}
+
 case "$1" in
 	start)
 		cb_start
+		;;
+	stop)
+		cb_stop
 		;;
 	say)
 		cb_say "$2"
