@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ### BEGIN INIT INFO
 # Provides:   craftbukkit
@@ -73,6 +73,7 @@ cb_start() {
 }
 
 cb_stop() {
+	echo "Sending message to all users to indicate the server is shutting down. Wait for 10 seconds."
 	cb_say "SERVER SHUTTING DOWN IN 10 SECONDS"
 	cb_save
 	sleep 10
@@ -95,7 +96,7 @@ cb_stop() {
 		fi
 	done
 
-	screen -p 0 -S $SCREEN -X exec exit
+	screen -p 0 -S $SCREEN -X quit
 
 	echo "Craftbukkit is stopped."
 }
