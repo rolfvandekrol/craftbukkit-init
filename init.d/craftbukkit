@@ -47,7 +47,7 @@ cb_save_on() {
 	cb_server_cmd "save-on"
 }
 
-cb_get_world() {
+cb_get_worlds() {
 	a=1
 	for NAME in $(ls $CRAFTBUKKIT_WORLD_STORAGE)
 	do
@@ -59,7 +59,7 @@ cb_get_world() {
 	done
 }
 cb_check_links() {
-	get_worlds
+	cb_get_worlds
 	for INDEX in ${!WORLDNAME[@]}
 	do
 		if [[ -L $CRAFTBUKKIT_PATH/${WORLDNAME[$INDEX]} || ! -a $CRAFTBUKKIT_PATH/${WORLDNAME[$INDEX]} ]]
