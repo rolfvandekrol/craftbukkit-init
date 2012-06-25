@@ -120,6 +120,15 @@ case "$1" in
             exit 1
         fi
         ;;
+    status)
+        # Shows server status
+        if is_running
+        then
+            echo "running."
+        else
+            echo "not running."
+        fi
+        ;;
     say)
         cb_say "$2"
         ;;
