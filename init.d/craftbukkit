@@ -17,135 +17,114 @@ if test -f /etc/default/craftbukkit; then
 fi
 
 is_running(){
-	if ps aux | grep "java.*${CRAFTBUKKIT_JAR}" | grep -v "su\|grep"  > /dev/null
-	then
-		return 0
-	fi
-	return 1
+    if ps aux | grep "java.*${CRAFTBUKKIT_JAR}" | grep -v "su\|grep"  > /dev/null
+    then
+        return 0
+    fi
+    return 1
 }
 
 cb_server_cmd() {
-	if is_running
-	then
-		screen -p 0 -S $SCREEN -X eval "stuff \"$1\"\015"
-	else
-		echo "Craftbukkit was not running. Not able to execute command."
-	fi
+    if is_running
+    then
+        screen -p 0 -S $SCREEN -X eval "stuff \"$1\"\015"
+    else
+        echo "Craftbukkit was not running. Not able to execute command."
+    fi
 }
 cb_say() {
-	cb_server_cmd "say $1"
+    cb_server_cmd "say $1"
 }
 cb_save() {
-	cb_server_cmd "save-all"
+    cb_server_cmd "save-all"
 }
 cb_save_off() {
-	cb_server_cmd "save-off"
-	sync
-	sleep 10
+    cb_server_cmd "save-off"
+    sync
+    sleep 10
 }
 cb_save_on() {
-	cb_server_cmd "save-on"
-}
-
-cb_get_worlds() {
-	a=1
-	for NAME in $(ls $CRAFTBUKKIT_WORLD_STORAGE)
-	do
-		if [ -d $CRAFTBUKKIT_WORLD_STORAGE/$NAME ]
-		then
-			WORLDNAME[$a]=$NAME
-			a=$a+1
-		fi
-	done
-}
-cb_check_links() {
-	cb_get_worlds
-	for INDEX in ${!WORLDNAME[@]}
-	do
-		if [[ -L $CRAFTBUKKIT_PATH/${WORLDNAME[$INDEX]} || ! -a $CRAFTBUKKIT_PATH/${WORLDNAME[$INDEX]} ]]
-		then
-			link=`ls -l $CRAFTBUKKIT_PATH/${WORLDNAME[$INDEX]} | awk '{print $11}'`
-
-			if [ "$link" != "${CRAFTBUKKIT_WORLD_STORAGE}/${WORLDNAME[$INDEX]}" ]
-			then
-				as_user "rm -f $CRAFTBUKKIT_PATH/${WORLDNAME[$INDEX]}"
-				as_user "ln -s ${CRAFTBUKKIT_WORLD_STORAGE}/${WORLDNAME[$INDEX]} $CRAFTBUKKIT_PATH/${WORLDNAME[$INDEX]}"
-				echo "Created link for ${WORLDNAME[$INDEX]}"
-			fi
-		else
-			echo "Could not process ${WORLDNAME[$INDEX]}. please move all worlds to ${CRAFTBUKKIT_WORLD_STORAGE}."
-			exit 1
-		fi
-	done
+    cb_server_cmd "save-on"
 }
 
 
 cb_start() {
-	# cd $CRAFTBUKKIT_PATH
-	cd $CRAFTBUKKIT_PATH
-	screen -dmS $SCREEN
-	screen -p 0 -S $SCREEN -X exec su $USERNAME -s /bin/bash -c "$INVOCATION"
+    # cd $CRAFTBUKKIT_PATH
+    cd $CRAFTBUKKIT_PATH
+    screen -dmS $SCREEN
+    screen -p 0 -S $SCREEN -X exec su $USERNAME -s /bin/bash -c "$INVOCATION"
 
-	seconds=0
-	until is_running 
-	do
-		sleep 1
-		seconds=$seconds+1
-		if [[ $seconds -eq 5 ]]
-		then
-			echo "Still not running, waiting a while longer..."
-		fi
-		if [[ $seconds -ge 120 ]]
-		then
-			echo "Failed to start, aborting."
-			exit 1
-		fi
-	done	
-	echo "Craftbukkit is running."
+    seconds=0
+    until is_running 
+    do
+        sleep 1
+        seconds=$seconds+1
+        if [[ $seconds -eq 5 ]]
+        then
+            echo "Still not running, waiting a while longer..."
+        fi
+        if [[ $seconds -ge 120 ]]
+        then
+            echo "Failed to start, aborting."
+            exit 1
+        fi
+    done    
+    echo "Craftbukkit is running."
 }
 
 cb_stop() {
-	echo "Sending message to all users to indicate the server is shutting down. Wait for 10 seconds."
-	cb_say "SERVER SHUTTING DOWN IN 10 SECONDS"
-	cb_save
-	sleep 10
-	cb_server_cmd "stop"
-	sleep 1
+    echo "Sending message to all users to indicate the server is shutting down. Wait for 10 seconds."
+    cb_say "SERVER SHUTTING DOWN IN 10 SECONDS"
+    cb_save
+    sleep 10
+    cb_server_cmd "stop"
+    sleep 1
 
-	seconds=0
-	while is_running 
-	do
-		sleep 1
-		seconds=$seconds+1
-		if [[ $seconds -eq 5 ]]
-		then
-			echo "Still running, waiting a while longer..."
-		fi
-		if [[ $seconds -ge 120 ]]
-		then
-			echo "Failed to stop, aborting."
-			exit 1
-		fi
-	done
+    seconds=0
+    while is_running 
+    do
+        sleep 1
+        seconds=$seconds+1
+        if [[ $seconds -eq 5 ]]
+        then
+            echo "Still running, waiting a while longer..."
+        fi
+        if [[ $seconds -ge 120 ]]
+        then
+            echo "Failed to stop, aborting."
+            exit 1
+        fi
+    done
 
-	screen -p 0 -S $SCREEN -X quit
+    screen -p 0 -S $SCREEN -X quit
 
-	echo "Craftbukkit is stopped."
+    echo "Craftbukkit is stopped."
 }
 
 case "$1" in
-	start)
-		cb_check_links
-		cb_start
-		;;
-	stop)
-		cb_stop
-		;;
-	say)
-		cb_say "$2"
-		;;
-	*)
-		echo "No such command, see $0 help"
-		exit 1
-		;;
+    start)
+        if is_running
+        then
+            echo "Craftbukkit already running. No starting."
+            exit 1
+        else
+            cb_start
+        fi
+        ;;
+    stop)
+        if is_running
+        then
+            cb_stop
+        else
+            echo "Craftbukkit not running. No starting."
+            exit 1
+        fi
+        ;;
+    say)
+        cb_say "$2"
+        ;;
+    *)
+        echo "No such command, see $0 help"
+        exit 1
+        ;;
 esac
