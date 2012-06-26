@@ -146,6 +146,7 @@ case "$1" in
         then
             cb_overviewer
         fi
+        ;;
     *)
         echo "No such command, see $0 help"
         exit 1
