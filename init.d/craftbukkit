@@ -101,6 +101,15 @@ cb_stop() {
     echo "Craftbukkit is stopped."
 }
 
+cb_overviewer() {
+    cb_say "Starting overviewer. Might cause a little lag."
+    cb_save
+    cb_save_off
+    overviewer.py -p 1 --config=/etc/overviewer/config.py --simple-output > /dev/null
+    cb_save_on
+    cb_say "Map regenerated"
+}
+
 case "$1" in
     start)
         if is_running
@@ -132,6 +141,11 @@ case "$1" in
     say)
         cb_say "$2"
         ;;
+    overviewer)
+        if is_running
+        then
+            cb_overviewer
+        fi
     *)
         echo "No such command, see $0 help"
         exit 1
